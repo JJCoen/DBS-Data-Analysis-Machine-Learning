@@ -45,16 +45,14 @@ instance, ‘Spam’, ‘Not Spam’ for email data. Each observation has the sa
 set of characteristic ‘features’. The algorithm learns the mapping from features
 to labels and so can make predictions about new observations. The predicted
 output is a probability estimation. Representations include decision trees,
-rules and instances. Evaluation measures are squared error, absolute error and bias error.   Gradient descent is one optimization technique.
+rules and instances. The confusion matrix or ROC curve are evaluation measures for a binary classifier. Gradient descent is one optimization technique.
 
 __Unsupervised Learning and its components__   
 Data does not contain
 desired outputs or labels. The algorithm must interpret the inherent structure
 in the data. It finds clusters of similar feature vectors. It is also used in
 dimension reduction in order to transform the feature vectors into a more
-concise form. Representations include graphical models and support vector
-machines. The confusion matrix or ROC curve are evaluation measures for a
-binary classifier.  Optimization methods are SVM loss and Entropy loss.
+concise form. Representations can be clusters or principal components.  Similarity measures evaluate true clusters that do not occur by chance.  Optimization seeks to minimise the variance of feature vectors from the cluster centre.
 
 __Common Types of Errors__   
 Errors can occur ‘in-sample’ on training data or ‘out-of-sample’ on new data.  Over-fitting is a
@@ -63,6 +61,18 @@ the test set gives an incorrect estimate of the accuracy on out-of-sample data.
 Error can be due to bias (simplifying assumptions about prediction function)
 and to variance (sensitivity of the prediction function to specific sets of
 training data).
+
+# Case Study: Online corporate reputation management for a political party.
+
+This study follows the framework described by Rantanen el al[^1] but has a different implementation.
+
+Multi-label Classification [^2]
+
+Types of classifiers:
+- Logistic Regression
+- SVM
+- Random Forests
+- Decision Trees
 
 
 Q2 Please solve the case study (2.5*4=10 marks) (800 words)  
@@ -94,3 +104,6 @@ Q3 Please write the summary of the journal paper you read and explain about the 
 Q4 Please also prepare presentation (10- 15 minutes) explaining Answer 2 and Answer 3 in detail. Presentation will be hold on 27-11-2020 on zoom during class.
 (20 marks)
 
+[^1]: https://www.emerald.com/insight/content/doi/10.1108/INTR-07-2018-0318/full/html#sec005
+
+[^2]: https://en.wikipedia.org/wiki/Multi-label_classification#Adapted_algorithms
