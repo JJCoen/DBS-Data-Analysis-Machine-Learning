@@ -1,6 +1,6 @@
 ---
-title: "CA1"
-author: "Jim Coen"
+title: "Data Analysis and Machine Learning"
+author: 'Author: Jim Coen'
 date: "`r format(Sys.Date(), '%A, %B %d, %Y') `"
 output:
   pdf_document:
@@ -9,15 +9,23 @@ output:
     number_sections: yes
     toc: yes
     toc_depth: 3
-    highlight:   tango
+    highlight: tango
+  html_document:
+    toc: yes
+    toc_depth: '3'
+    df_print: paged
+subtitle: Continuous Assessment 1
 sansfont: Calibri Light
 fontsize: 12pt
 documentclass: article
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library("tinytex")
+library(data.table)
+library(kableExtra)
+library(magrittr)
 ```
 
 # Definitions  
@@ -45,7 +53,7 @@ instance, ‘Spam’, ‘Not Spam’ for email data. Each observation has the sa
 set of characteristic ‘features’. The algorithm learns the mapping from features
 to labels and so can make predictions about new observations. The predicted
 output is a probability estimation. Representations include decision trees,
-rules and instances. The confusion matrix or ROC curve are evaluation measures for a binary classifier. Gradient descent is one optimization technique.
+rules and instances. Evaluation using absolute error is robust to outliers while squared error is not. Gradient descent is one optimization technique for numeric outcomes.
 
 __Unsupervised Learning and its components__   
 Data does not contain
@@ -62,48 +70,160 @@ Error can be due to bias (simplifying assumptions about prediction function)
 and to variance (sensitivity of the prediction function to specific sets of
 training data).
 
-# Case Study: Online corporate reputation management for a political party.
+# Case Study: Online approval rating for a political party  
 
-This study follows the framework described by Rantanen el al[^1] but has a different implementation.
+> “It takes many good deeds to build a good reputation,
+> and only one bad one to lose it.”  
+> Benjamin Franklin
 
-Multi-label Classification [^2]
+## Background   
+Fianna Fáil is in danger of loosing its distinctiveness as a political party.  Maintaining and increasing voter approval is vital.  At the same, there is major upheaval in Irish society due to the Wuhan virus and Brexit.  In order to manage these threats, the public needs to 'buy in' to policy decisions.  In addition, the behaviour of high-ranking party members can incite adverse reaction from the public.  The party needs to be aware of issues and personalities in order to deal with crises pro-actively.  Users and bloggers discuss all these topics in social media posts.
 
-Types of classifiers:
-- Logistic Regression
-- SVM
-- Random Forests
-- Decision Trees
+In addition, the reputation of the party leader has a high correlation with overall party image[^1].  Consequently, this is the most important dimension of party reputation.  Sub-dimensions are leadership ability, decision-making  and sentiment towards the person themselves.
+
+Focus groups have been employed to inform election campaigns and to assess election outcomes[^2].  However, there is time lag between an issue arising and assessing public opinion.  On the contrary, an online application can provide 'up-to-the-second' insight into public perception of Fianna Fáil and its policy announcements.  
+
+## Business Outcome  
+The desired outcome is improved awareness by Fianna Fáil of its perception among the public.  Limiting the spread of the Wuhan virus demonstrates the importance of reputation awareness.  It could inform Fianna Fáil of what level of restrictions that the public are willing to adopt.  By assessing the level of approval, it could provide insight into areas that need greater explanation.  
+
+On the contrary, divergence between reputation and reality is a risk to the operation of large organisations[^3].
+
+Granularity in reputation dimension would enable Fianna Fáil to focus on specific aspects party activity, as shown in table 1.  It would monitor public response to policy statements, political actions and personal behaviour.  
+
+```{r}
+reputation <- data.table("Party Criteria" = 
+                           c("Identity", "Policy", "Personality", "Leader"),
+                         "Reputation Dimension" = 
+                           c("Recognition", "Approval", "Sentiment", "Competence"))
+
+kbl(reputation,
+        caption="Classifying Political Party Reputation",
+        booktabs = TRUE,
+        align = "c") %>%
+    kable_styling(latex_options = "striped",
+                             full_width = FALSE) %>% 
+    row_spec(0, bold = TRUE)
+        
+```
+
+## Evaluating business success
+Business success occurs when one or all of the reputation dimensions improve.  What a reputation management system can do is to make the party more aware of its reputation among voters.  In that sense, success comes when the reputation system reflects accurately the general attitude towards the party.
+
+Fianna Fáil has an extensive organisation with party members throughout the whole country.  It is especially important to keep these individuals engaged with and promoting party policy.  It would be possible to create an internet forum for these members and evaluate party reputation among this cohort.  In particular, a reputation management system could detect shifts in opinion.  Human judgement has a role to play here.  Certain members are aware of the general attitude towards the party.  They could confirm whether the reputation system reflects opinion accurately.
+
+Having proved itself with party members, the reputation system could be rolled out for the public.  
+
+## Strategic Plan for Machine Learning Adoption   
+1. It is necessary to educate Fianna Fáil executives of successful Machine Learning (ML) projects.   
+2. They need to realise the viability of a reputation management system by pointing to the ML model created for the banking sector[^4].   
+3.  By presenting the framework of how such a system could work for Fianna Fáil, it would give executives greater confidence in the project.  Explaining the  concept of supervised learning would give greater assurance.
+
+As in the banking reputation system, training data could be created from historic social media posts.  An initial system could classify reputation as simply 'positive' or 'negative'.  The confusion matrix and ROC curve could evaluate such a binary classifier.  Later developments would give a ranking based on probability estimates.
+
+It is important to have benchmark data to evaluate the accuracy of an ML algorithm.  Fortunately, Kaggle contains the Political Social Media Posts dataset[^5].
+
+### Current overall state of machine learning readiness. 
+
+One researcher has experience of using PySpark over a three month period in 2015 and the same in 2016.  However, a system based upon Pandas dataframes and Python libraries would be more feasible.  Further training is necessary before this can be achieved.
+
+## Risk Management   
+Development of the training dataset is critical.  There are several concerns:     
+
+1. Limited domain knowledge may lead to inaccuracies in the training set.  
+
+2.  The index or statistic to rank reputation needs to be a true reflection of opinion expressed in a social media post.  
+
+3. The reputation system needs to reflect broad public opinion and not just that of a few activists who write a high proportion of posts.  
+
+4. Creating the training data may take considerable work effort and time.  For Banking Reputation system, there were one researcher and two research assistants manually coding the data.  
+
+5. The US presidential election has given rise to the phenomena of the silent Trump voter.  These are people who have been castigated by public figures as 'deplorable' and even violently assaulted by antifa.  Since antifa is already organising in Ireland, non-response bias may become a problem.  
+
+6. In the political sphere, there will be posts that are highly emotive and even inflammatory.  
+
+7. Social media companies are biased towards certain viewpoints and censors alternative opinion[^6].
 
 
-Q2 Please solve the case study (2.5*4=10 marks) (800 words)  
-The purpose of this assignment is to build your machine learning project plan. For this exercise, you can
-use any one of the example scenarios provided with a completely fictitious example of the problem. You
-will be developing a strategic plan for machine learning adoption within this company, and eventually
-proposing a structure for a successful machine learning project. You will start by describing your current
-overall state of machine learning readiness. You will then explain the business outcome your project is
-driving towards, and how business success will be evaluated. You will describe, at a high-level, what
-machine learning project you wish to undertake. Finally you will outline the risks of this approach, in
-relation to your stage of readiness and the scope of the project.
+# Review of SenTube: A Corpus for Sentiment Analysis  
 
-Select any-one of them  
- You are in the social media division of a political party, and you want to keep better track of the party’s profile and reputation online.  
- You are the head of the Corporate clients division of a major health service provider chain, and you want corporate health applications decided faster and better.  
- You are a software designer and you want to use ML to improve the user experience.  
+## Summary
+The authors created a dataset for use as a benchmark in text categorisation and sentiment analysis of social media texts.  The application domain is comments of products (tablets and automobiles) on YouTube.  It goes beyond per-document sentiment labeling.  It distinguishes between comments on the product itself and those concerning the video.  Researchers manually annotated comments according to content and sentiment polarity, as shown in table 2.
 
-Answer the following questions
-1) Provide a brief description of your company, industry, or business.  
-2) What business outcome are you supporting with your machine learning project? How is this outcome relevant and important for the company? How will you evaluate whether the desired outcome is being
-achieved?  
-3) What machine learning project will you propose to support this business outcome? At a high level, what will your machine learning model be doing? Make the case that this is a viable project (at least in theory) and relates to your overall business goals.  
-4) Given the state of readiness you have described and the scope of the project you're proposing, is this a
-risky project, broadly speaking? That is, is it appropriate to the stage your company is at or will it provide particular challenges?
+The paper highlights problems with data from Twitter streams.  Twitter does not provide the text fragments themselves, only IDs to those tweets.  Researchers who wish to create an annotated dataset of Twitter comments must download the individual tweets.  This leads to reproducibility problems since tweets are often deleted later on.
 
-Q3 Please write the summary of the journal paper you read and explain about the machine learning techniques you learn from the journal and what are the advantage and disadvantage of the application discussed in the research project.
-(800 words) (5 Marks)
+A means of incorporating user profile is important.  Those who create videos tend to be experts on a topic and thus, are social "influencers".  They are the counterpart of the activist in the political arena.
 
-Q4 Please also prepare presentation (10- 15 minutes) explaining Answer 2 and Answer 3 in detail. Presentation will be hold on 27-11-2020 on zoom during class.
-(20 marks)
+An interesting finding from the statistical distribution of comment sentiment is that single opinion labels per document are insufficient.  Comments can relate to more than one item (both video and product) and have distinct sentiment polarity for each.
 
-[^1]: https://www.emerald.com/insight/content/doi/10.1108/INTR-07-2018-0318/full/html#sec005
+## Annotation Guidelines
 
-[^2]: https://en.wikipedia.org/wiki/Multi-label_classification#Adapted_algorithms
+Besides the benchmark itself, the main contribution of Sentube project is the set of guidelines to promote accuracy and consistency in annotations.  Annotators have a fixed set of options for selecting labels.  These annotations deal only with identity (whether the text is video-related or product-related).  Apart from sentiment polarity, labels do not have qualitative dimensions (attractiveness, convenience, durability).
+
+In order to ensure standardisation in labeling, the authors assessed agreement among four annotators working on a sample set of one hundred comments.  They measure the level of agreement using Krippendorff’s $\alpha$ coefficient.  This varies from 0 (perfect disagreement) to 1 (perfect agreement).  An $\alpha$ level greater that 0.8 is recommended[^7].  The Sentube annotators achieved $\alpha$ levels greater than 0.75 on comment content.  However, when dealing with sentiment polarity, $\alpha$ was in the range of 0.6 - 0.7.  Authors report that 
+they created "a gold-standard sample, adjusted by the four annotators".  They do not mention how disagreement in labeling was dealt with.  
+
+At length, the task was given to a single annotator, not a member of the group above.  She inspected 208 videos and waded through almost 36 thousand comments!
+
+```{r}
+sentube <- data.table("Classification" = 
+                           c("Product-related", "Video-related", "Spam", "off-topic", "non-English"),
+                      "Sentiment Polarity" = 
+                           c("positive", "negative", " ", " ", " "),
+                      "Information Content" = c("0 - 3 stars", " ", " ", " ", " ")
+                        )
+
+kbl(sentube,
+        caption="Annotating comments with labels",
+        booktabs = TRUE,
+        align = "c") %>%
+    kable_styling(latex_options = "striped",
+                             full_width = FALSE) %>% 
+    row_spec(0, bold = TRUE)
+```
+
+## Machine Learning Techniques  
+1. Labeling  
+The article is primarily concerned with creating a benchmark dataset and how to assign labels appropriate for sentiment analysis.  This is in order to facilitate Supervised Learning.   The authors note the high variance in social media posts.  However, the use of annotation guidelines introduces bias, thus reducing variance.
+
+1. Baseline model  
+In addition to a benchmark dataset, it is necessary to report on the accuracy obtained from a baseline model.  The authors created a "bag-of-words" model to process the Sentube dataset.  This can serve as a standard for independent researchers, working in sentiment analysis, to evaluate the accuracy of their ML algorithm.  
+
+2. Multi-Class Classification  
+The authors created a multi-class classifier.  This means that it can handle both video and text and it classifies along two dimensions, sentiment polarity and comment type.  
+
+3. Support Vector Machine   
+The Machine Learning algorithm is a Support Vector Machine that produces a linear separation between types of comments including spam.  It also sets the linear boundary between positive and negative sentiments.
+
+## Advantages and Disadvantages
+
+### Pro
+1. Since the source data comes from YouTube, researchers emphasise the stability of the Sentube dataset in comparison to Twitter posts.  
+
+2. YouTube comments tend to follow along a particular topic or thread.  This is useful for natural language analysis of discussions and conversations.   
+
+4. Despite the promise of automation implicit in the term 'Machine Learning', there is a high degree of human input in creating a labeled dataset.  Such input is particularly necessary in sentiment analysis.  A person can recognise nuances that a machine cannot.  The Sentube project is a template for annotating data in this field.
+
+4. Well-formulated annotation guidelines are necessary in application domains not conducive to automatic label assignment.
+
+### Con
+1. Twitter, Facebook and YouTube are commercial organisations.  They may favour  companies that pay product placement fees.  
+
+2. Sentiment analysis is likely to require finer granularity than polarity alone.
+
+3. Doesn't take account of secondary input form 'likes' / 'dislikes'
+
+[^1]: Davies, G., & Mian, T. (2010). _The reputation of the party leader and of the party being led_. European Journal of Marketing, 44(3–4), 331–350. https://doi.org/10.1108/03090561011020453
+
+[^2]: Breitenfelder, U. et al (2004) _The Use of Focus Groups in the Process of Political Research and Consultancy Qualitative Social Research_ [Online].  Available at: https://www.qualitative-research.net/index.php/fqs/article/view/591
+
+[^3]: Eccles, R. et al (2007) _Reputation and Its Risks_ Harvard Business Review, February 2007. Available at:
+https://hbr.org/2007/02/reputation-and-its-risks
+
+[^4]: Rantanen, A., Salminen, J., Ginter, F., & Jansen, B. J. (2019). _Classifying online corporate reputation with machine learning: a study in the banking domain_. Internet Research, 30(1), 45–66.  Available at: https://doi.org/10.1108/INTR-07-2018-0318https://www.emerald.com/insight/content/doi/10.1108/INTR-07-2018-0318/full/html#sec005
+
+[^5]: _Political Social Media Posts_ Figure Eight and Kaggle. (2016). Available at:
+https://www.kaggle.com/crowdflower/political-social-media-posts
+
+[^6]: Epstein, R. (2018). _Google and Big Tech bias hurts democracy, not just conservatives_. USA Today.  Available at: https://eu.usatoday.com/story/opinion/2018/09/13/google-big-tech-bias-hurts-democracy-not-just-conservatives-column/1265020002/
+
+[^7]: Krippendorff, K. (2004). _Content analysis: An introduction to its methodology_. Thousand Oaks, California: Sage.
